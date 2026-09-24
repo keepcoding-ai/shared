@@ -2,23 +2,26 @@
 
 Arquivos públicos compartilhados da equipe.
 
-Cada arquivo é um asset de release. O link é estável e aberto:
+## Projetos
+
+- **[hands](hands/)** — conversar com o seu agente pelo computador, emprestando a ele as suas pastas.
+
+## Como funciona
+
+Cada projeto tem uma pasta com o nome dele e publica suas versões em releases
+com o mesmo prefixo — `hands/` publica em `hands-v0.1.0`. Uma tag nunca é
+reescrita: versão nova, tag nova.
 
 ```
 https://github.com/keepcoding-ai/shared/releases/download/<tag>/<arquivo>
 ```
 
-Baixe como preferir — navegador, `curl`, `wget`, `gh release download`. Não há
-formato obrigatório nem índice a manter.
-
-## Publicar
+O link é estável e aberto — navegador, `curl`, `wget`, `gh release download`.
 
 ```
 gh release create <tag> --repo keepcoding-ai/shared --title "<titulo>" --notes "<o que e>"
 gh release upload <tag> --repo keepcoding-ai/shared <arquivo>
 ```
-
-Uma tag nunca é reescrita: versão nova, tag nova.
 
 ## Limites
 
