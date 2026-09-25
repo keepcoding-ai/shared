@@ -5,6 +5,7 @@ Arquivos públicos compartilhados da equipe.
 ## Projetos
 
 - **[hands](hands/)** — conversar com o seu agente pelo computador, emprestando a ele as suas pastas.
+- **[eitri-desktop](eitri-desktop/)** — app de computador da Eitri (Mac).
 
 ## Como funciona
 
