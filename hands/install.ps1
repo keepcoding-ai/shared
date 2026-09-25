@@ -89,21 +89,74 @@ try {
 
 # --- Deixar o nome 'hands' disponivel no terminal ----------------------------
 
-$PathDoUsuario = [Environment]::GetEnvironmentVariable('Path', 'User')
-if (-not $PathDoUsuario) { $PathDoUsuario = '' }
+function Entradas($texto) {
+    if (-not $texto) { return @() }
+    $texto.Split(';') | Where-Object { $_ -and $_.Trim() }
+}
 
-$jaEsta = $PathDoUsuario.Split(';') | Where-Object { $_.TrimEnd('\') -ieq $Destino.TrimEnd('\') }
+function PathDoUsuario {
+    $v = [Environment]::GetEnvironmentVariable('Path', 'User')
+    if ($v) { $v } else { '' }
+}
+
+# Quem o terminal REALMENTE abre numa janela nova. Nao usamos $env:Path porque a
+# sessao atual pode estar suja; o Windows compoe primeiro as entradas da maquina
+# e depois as do usuario, e e' essa ordem que vale.
+function QuemGanha {
+    $todas = @()
+    $todas += Entradas ([Environment]::GetEnvironmentVariable('Path', 'Machine'))
+    $todas += Entradas (PathDoUsuario)
+    foreach ($entrada in $todas) {
+        $pasta = [Environment]::ExpandEnvironmentVariables($entrada.Trim()).TrimEnd('\')
+        if (-not $pasta) { continue }
+        foreach ($nome in @('hands.exe', 'hands.cmd', 'hands.bat')) {
+            $candidato = Join-Path $pasta $nome
+            if (Test-Path -LiteralPath $candidato -PathType Leaf) { return $candidato }
+        }
+    }
+    return $null
+}
+
+$atual  = PathDoUsuario
+$jaEsta = Entradas $atual | Where-Object { $_.Trim().TrimEnd('\') -ieq $Destino.TrimEnd('\') }
 
 if (-not $jaEsta) {
     try {
-        $novo = if ($PathDoUsuario.Trim()) { "$($PathDoUsuario.TrimEnd(';'));$Destino" } else { $Destino }
-        [Environment]::SetEnvironmentVariable('Path', $novo, 'User')
+        [Environment]::SetEnvironmentVariable('Path', ((@(Entradas $atual) + @($Destino)) -join ';'), 'User')
     } catch {
         Fail "instalei o programa, mas nao consegui deixa-lo acessivel pelo nome. Fale com o suporte."
     }
 }
 
-$env:Path = "$env:Path;$Destino"
+# --- Outra copia do hands pode estar ganhando de nos -------------------------
+#
+# Achado em teste real: quem ja tinha o hands instalado por npm (%APPDATA%\npm)
+# continuava abrindo a copia ANTIGA, porque aquela pasta vem antes no PATH.
+# "Pronto, instalado" na tela e binario velho no terminal e' a pior falha que
+# existe: calada, e com mensagem de sucesso na frente.
+#
+# Resposta: mover a NOSSA pasta para a frente do PATH do usuario. E' seguro
+# porque essa pasta e' exclusivamente nossa e so tem o hands.exe dentro, entao o
+# unico comando que ela pode sombrear e' o 'hands' - que e' exatamente o que
+# quem colou a linha de instalacao pediu. A ordem relativa de todo o resto do
+# PATH fica intacta.
+#
+# Se ainda assim perdermos (a outra copia esta' no PATH da MAQUINA, que exige
+# administrador para mexer), nao insistimos: avisamos, nomeando o caminho.
+
+$vencedor = QuemGanha
+
+if ($vencedor -and (Split-Path $vencedor -Parent).TrimEnd('\') -ine $Destino.TrimEnd('\')) {
+    try {
+        $outras = Entradas (PathDoUsuario) | Where-Object { $_.Trim().TrimEnd('\') -ine $Destino.TrimEnd('\') }
+        [Environment]::SetEnvironmentVariable('Path', ((@($Destino) + @($outras)) -join ';'), 'User')
+    } catch {
+        # Nao conseguimos reordenar; o aviso no fim ainda sai.
+    }
+    $vencedor = QuemGanha
+}
+
+$env:Path = "$Destino;$env:Path"
 
 # --- Conferir ----------------------------------------------------------------
 
@@ -119,8 +172,33 @@ if (-not $instalada) {
 
 Write-Host ""
 Write-Host "  Pronto. hands $($instalada.Trim()) instalado." -ForegroundColor Green
-Write-Host ""
-Write-Host "  Abra uma janela NOVA do terminal e digite:"
-Write-Host ""
-Write-Host "      hands" -ForegroundColor Cyan
-Write-Host ""
+
+$conflito = $vencedor -and (Split-Path $vencedor -Parent).TrimEnd('\') -ine $Destino.TrimEnd('\')
+
+if ($conflito) {
+    Write-Host ""
+    Write-Host "  Atencao: existe outra copia do hands neste computador, mais antiga," -ForegroundColor Yellow
+    Write-Host "  e e' ela que o terminal abre:" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "      $vencedor"
+    Write-Host ""
+    Write-Host "  Enquanto esse arquivo existir, voce nao vai usar a versao que"
+    Write-Host "  acabou de ser instalada, e ela nao se atualiza sozinha."
+    Write-Host ""
+    $pastaVencedora = Split-Path $vencedor -Parent
+    $temNodeModules = Test-Path -LiteralPath (Join-Path $pastaVencedora 'node_modules\hands')
+    if ($temNodeModules -or $vencedor -match '\\npm\\' -or $vencedor -match '\\node_modules\\') {
+        Write-Host "  Para remover, cole esta linha e aperte Enter:"
+        Write-Host ""
+        Write-Host "      npm uninstall -g hands" -ForegroundColor Cyan
+    } else {
+        Write-Host "  Peca ao suporte para remover esse arquivo."
+    }
+    Write-Host ""
+} else {
+    Write-Host ""
+    Write-Host "  Abra uma janela NOVA do terminal e digite:"
+    Write-Host ""
+    Write-Host "      hands" -ForegroundColor Cyan
+    Write-Host ""
+}

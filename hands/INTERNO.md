@@ -97,6 +97,46 @@ o `.old` no proximo boot). No Unix o `rename(2)` sobre o binario em uso e'
 atomico e funciona direto. O nome `hands.exe.baixando` e' do instalador —
 quem implementar a troca adiada use outro.
 
+## Colisao de PATH com uma instalacao anterior
+
+Achado em teste real depois do `hands-v0.1.0` ir ao ar: numa maquina que ja
+tinha o `hands` por npm (`%APPDATA%\npm`), a instalacao nova dizia
+**"Pronto. hands 0.1.0 instalado"** e o terminal continuava abrindo a copia
+ANTIGA — a pasta do npm vem antes no PATH, e a nossa era acrescentada depois.
+Falha calada, com mensagem de sucesso na frente, justamente na copia que nao
+sabe se atualizar sozinha.
+
+Os dois instaladores agora detectam quem o terminal REALMENTE vai abrir numa
+janela nova (no Windows, compondo PATH da maquina + do usuario, nunca o
+`$env:Path` da sessao suja; no Unix, prevendo o efeito da linha de perfil que
+acabamos de escrever). A resposta e' **diferente por plataforma, de proposito**:
+
+- **Windows: reordenamos.** `%LOCALAPPDATA%\Programs\hands` e' uma pasta
+  exclusivamente nossa, com um unico arquivo dentro. Move-la para a frente do
+  PATH do usuario so pode sombrear o comando `hands` — que e' exatamente o que
+  quem colou a linha pediu. A ordem relativa de todo o resto fica intacta.
+  Se o usuario apagar o nosso `hands.exe` depois, a entrada vira caminho morto
+  e a copia anterior volta a responder sozinha; nada a desfazer.
+  Se mesmo assim perdermos (a outra copia esta' no PATH da MAQUINA, que exige
+  administrador), nao insistimos: cai no aviso.
+- **Unix: NAO reordenamos, so avisamos.** `~/.local/bin` e' compartilhada com
+  outros programas do usuario; coloca-la na frente mudaria qual versao ele abre
+  de TUDO o que estiver la dentro, nao so do hands. Preco alto demais para o
+  problema.
+
+O aviso nomeia o **caminho que esta' ganhando** — nunca presume npm. A dica
+`npm uninstall -g hands` so aparece quando ha assinatura de npm no disco:
+atalho apontando para dentro de `node_modules`, ou um `node_modules/hands` ao
+lado. E sai **no fim, junto do "Pronto"**, nao no meio do download.
+
+Duas fragilidades que a prova pegou, e que valem lembrar em quem mexer aqui:
+
+1. A varredura exigia o bit de execucao. Num sistema de arquivos que nao
+   reporta esse bit, o instalador acusava conflito **com ele mesmo** e mandava
+   o usuario apagar o arquivo certo. O nosso caminho agora conta por existir.
+2. A deteccao de npm dependia de `readlink`. Onde o atalho nao e' symlink de
+   verdade, a dica nao saia. Por isso as duas assinaturas.
+
 ## macOS: Gatekeeper
 
 Os arquivos de Mac **não são assinados nem notarizados**. O `install.sh`

@@ -115,6 +115,48 @@ case ":${PATH}:" in
     ;;
 esac
 
+# --- Outra copia do hands pode estar ganhando de nos -------------------------
+#
+# Achado em teste real no Windows: quem ja tinha o hands instalado por npm
+# continuava abrindo a copia ANTIGA, porque a pasta dela vem antes no PATH.
+# "Pronto, instalado" na tela e programa velho no terminal e' falha calada.
+#
+# Aqui NAO reordenamos o PATH de ninguem: diferente do Windows, ~/.local/bin e'
+# uma pasta compartilhada com outros programas do usuario, e coloca-la na
+# frente mudaria qual versao ele abre de TUDO o que estiver la dentro, nao so
+# do hands. Entao: detectamos e avisamos, nomeando o arquivo que esta' ganhando.
+#
+# O PATH que vale e' o da PROXIMA janela: se acabamos de escrever a linha no
+# perfil, ~/.local/bin entra na frente e nos ganhamos.
+
+if [ "$precisa_reabrir" = "1" ]; then
+  PATH_PREVISTO="${DESTINO}:${PATH}"
+else
+  PATH_PREVISTO="${PATH}"
+fi
+
+vencedor=""
+ifs_antigo="$IFS"
+IFS=':'
+for pasta in $PATH_PREVISTO; do
+  [ -n "$pasta" ] || continue
+  candidato="${pasta}/hands"
+  [ -f "$candidato" ] || continue
+  # O nosso programa conta por existir: a conferencia `--version` logo abaixo e'
+  # que prova que ele executa. Exigir o bit aqui nos fazia acusar conflito com
+  # nos mesmos em sistema de arquivos que nao reporta permissao.
+  if [ "$candidato" = "$PROGRAMA" ] || [ -x "$candidato" ]; then
+    vencedor="$candidato"
+    break
+  fi
+done
+IFS="$ifs_antigo"
+
+conflito=0
+if [ -n "$vencedor" ] && [ "$vencedor" != "$PROGRAMA" ]; then
+  conflito=1
+fi
+
 # --- Conferir ----------------------------------------------------------------
 
 instalada="$("$PROGRAMA" --version 2>/dev/null || true)"
@@ -123,10 +165,31 @@ if [ -z "$instalada" ]; then
   falhou "o programa foi instalado mas não respondeu. Tente de novo, ou fale com o suporte."
 fi
 
-printf '\n  Pronto. hands %s instalado.\n\n' "$instalada"
+printf '\n  Pronto. hands %s instalado.\n' "$instalada"
 
-if [ "$precisa_reabrir" = "1" ]; then
-  printf '  Abra uma janela NOVA do terminal e digite:\n\n      hands\n\n'
+if [ "$conflito" = "1" ]; then
+  printf '\n  Atenção: existe outra cópia do hands neste computador, mais antiga,\n'
+  printf '  e é ela que o terminal abre:\n\n      %s\n\n' "$vencedor"
+  printf '  Enquanto esse arquivo existir, você não vai usar a versão que\n'
+  printf '  acabou de ser instalada, e ela não se atualiza sozinha.\n\n'
+  # Veio do npm? Duas assinaturas, porque uma sozinha falha: o atalho aponta
+  # para dentro de node_modules, e/ou existe um node_modules/hands ao lado.
+  do_npm=0
+  alvo="$(readlink "$vencedor" 2>/dev/null || true)"
+  case "${alvo}${vencedor}" in
+    *node_modules*|*/npm/*) do_npm=1 ;;
+  esac
+  prefixo="$(dirname "$(dirname "$vencedor")")"
+  if [ -d "${prefixo}/lib/node_modules/hands" ]; then do_npm=1; fi
+  if [ -d "$(dirname "$vencedor")/node_modules/hands" ]; then do_npm=1; fi
+
+  if [ "$do_npm" = "1" ]; then
+    printf '  Para remover, cole esta linha e aperte Enter:\n\n      npm uninstall -g hands\n\n'
+  else
+    printf '  Peça ao suporte para remover esse arquivo.\n\n'
+  fi
+elif [ "$precisa_reabrir" = "1" ]; then
+  printf '\n  Abra uma janela NOVA do terminal e digite:\n\n      hands\n\n'
 else
-  printf '  Para começar, digite:\n\n      hands\n\n'
+  printf '\n  Para começar, digite:\n\n      hands\n\n'
 fi
