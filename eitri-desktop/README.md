@@ -4,7 +4,7 @@ App de computador da Eitri — a mesma casa de `https://eitri.keepcoding.app/so/
 
 ## Baixar (Mac, Apple Silicon)
 
-[Eitri_0.1.1_aarch64.dmg](https://github.com/keepcoding-ai/shared/releases/download/eitri-desktop-v0.1.1/Eitri_0.1.1_aarch64.dmg)
+[Eitri_0.1.2_aarch64.dmg](https://github.com/keepcoding-ai/shared/releases/download/eitri-desktop-v0.1.2/Eitri_0.1.2_aarch64.dmg)
 
 ## Instalar
 
@@ -21,4 +21,5 @@ App de computador da Eitri — a mesma casa de `https://eitri.keepcoding.app/so/
 
 | Versão | Plataforma | Release |
 |---|---|---|
+| 0.1.2 | macOS Apple Silicon (não assinado) — ícone na marca | `eitri-desktop-v0.1.2` |
 | 0.1.1 | macOS Apple Silicon (não assinado) | `eitri-desktop-v0.1.1` |
