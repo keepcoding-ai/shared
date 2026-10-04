@@ -5,6 +5,7 @@ Arquivos públicos compartilhados da equipe.
 ## Projetos
 
 - **[hands](hands/)** — conversar com o seu agente pelo computador, emprestando a ele as suas pastas.
+- **[soul-cli](soul-cli/)** — o terminal dos agentes do Atrium: conversar com o agente pela linha de comando.
 - **[eitri-desktop](eitri-desktop/)** — app de computador da Eitri (Mac).
 
 ## Como funciona
