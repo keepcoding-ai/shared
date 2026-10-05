@@ -43,17 +43,18 @@ dentro do `soul-cli`:
 - **Auto-update channel** — `stable` recebe só as versões que já provaram bem em
   uso; `latest` recebe toda versão nova, assim que sai.
 
-## Canal das versões mais novas
+## Canal estável
 
-A linha de instalação acima instala a versão **estável**. Quem quer a mais nova
-cola, antes da linha, no PowerShell:
+A linha de instalação acima instala a versão **mais nova** publicada (canal
+`latest`, o mesmo que o programa instalado usa para se atualizar). Quem quer só
+as versões promovidas depois de uso cola, antes da linha, no PowerShell:
 
 ```powershell
-$env:SOUL_CLI_CHANNEL = 'latest'
+$env:SOUL_CLI_CHANNEL = 'stable'
 ```
 
 e no Terminal:
 
 ```sh
-export SOUL_CLI_CHANNEL=latest
+export SOUL_CLI_CHANNEL=stable
 ```

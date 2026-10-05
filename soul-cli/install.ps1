@@ -7,9 +7,9 @@
 # PATH do usuario. Rodar de novo atualiza a versao instalada.
 #
 # Qual versao: o instalador pergunta ao GitHub e pega a MAIOR versao publicada
-# do canal estavel (soul-cli-v*, sem a marca de pre-lancamento). Para o canal
-# das versoes mais novas: $env:SOUL_CLI_CHANNEL = 'latest' antes de rodar. Para
-# uma versao exata: $env:SOUL_CLI_VERSION = '0.2.0'.
+# (soul-cli-v*), o mesmo canal 'latest' que o programa instalado usa para se
+# atualizar. Para so' as versoes promovidas depois de uso: $env:SOUL_CLI_CHANNEL
+# = 'stable' antes de rodar. Para uma versao exata: $env:SOUL_CLI_VERSION = '0.2.0'.
 #
 # O arquivo baixado so vira o programa se a soma SHA-256 bater com a do
 # SHA256SUMS da release. Sem isso, nada e instalado.
@@ -51,7 +51,7 @@ switch ($arquitetura.ToUpper()) {
 
 # --- Qual versao -------------------------------------------------------------
 
-$Canal = if ($env:SOUL_CLI_CHANNEL -eq 'latest') { 'latest' } else { 'stable' }
+$Canal = if ($env:SOUL_CLI_CHANNEL -eq 'stable') { 'stable' } else { 'latest' }
 
 if ($env:SOUL_CLI_VERSION) {
     if ($env:SOUL_CLI_VERSION -notmatch '^\d+\.\d+\.\d+$') { Fail "a versao pedida ($($env:SOUL_CLI_VERSION)) nao tem o formato 0.2.0." }
@@ -77,7 +77,7 @@ if ($env:SOUL_CLI_VERSION) {
     }
     if (-not $melhor) {
         if ($Canal -eq 'latest') { Fail "ainda nao ha nenhuma versao publicada do soul-cli para este computador." }
-        Fail "ainda nao ha versao estavel do soul-cli. Para instalar a mais nova: `$env:SOUL_CLI_CHANNEL = 'latest' e rode de novo."
+        Fail "ainda nao ha versao estavel do soul-cli. Para instalar a mais nova, rode de novo sem `$env:SOUL_CLI_CHANNEL."
     }
     $Version = $melhor.ToString()
 }

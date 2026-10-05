@@ -8,9 +8,9 @@
 # atualiza a versão instalada.
 #
 # Qual versão: o instalador pergunta ao GitHub e pega a MAIOR versão publicada
-# do canal estável (soul-cli-v*, sem a marca de pré-lançamento). Para o canal
-# das versões mais novas: SOUL_CLI_CHANNEL=latest antes de rodar. Para uma
-# versão exata: SOUL_CLI_VERSION=0.2.0.
+# (soul-cli-v*), o mesmo canal `latest` que o programa instalado usa para se
+# atualizar. Para só as versões promovidas depois de uso: SOUL_CLI_CHANNEL=stable
+# antes de rodar. Para uma versão exata: SOUL_CLI_VERSION=0.2.0.
 #
 # O arquivo baixado só vira o programa se a soma SHA-256 bater com a do
 # SHA256SUMS da release. Sem isso, nada é instalado.
@@ -77,8 +77,8 @@ trap 'rm -rf "$TMP_DIR"' EXIT INT TERM
 
 # --- Qual versão -------------------------------------------------------------
 
-CANAL="stable"
-[ "${SOUL_CLI_CHANNEL:-}" = "latest" ] && CANAL="latest"
+CANAL="latest"
+[ "${SOUL_CLI_CHANNEL:-}" = "stable" ] && CANAL="stable"
 
 if [ -n "${SOUL_CLI_VERSION:-}" ]; then
   case "$SOUL_CLI_VERSION" in
@@ -107,7 +107,7 @@ else
     if [ "$CANAL" = "latest" ]; then
       falhou "ainda não há nenhuma versão publicada do soul-cli."
     fi
-    falhou "ainda não há versão estável do soul-cli. Para instalar a mais nova: SOUL_CLI_CHANNEL=latest antes da linha de instalação."
+    falhou "ainda não há versão estável do soul-cli. Para instalar a mais nova, rode de novo sem SOUL_CLI_CHANNEL."
   fi
 fi
 
