@@ -4,9 +4,9 @@ Cada terminal do **tether** lembra qual sessão do Claude Code (ou do soul-cli) 
 
 ## Baixar (Windows 64 bits)
 
-[tether-0.1.0-win-x64.exe](https://github.com/keepcoding-ai/shared/releases/download/tether-v0.1.0/tether-0.1.0-win-x64.exe) — instalador
+[tether-0.1.1-win-x64.exe](https://github.com/keepcoding-ai/shared/releases/download/tether-v0.1.1/tether-0.1.1-win-x64.exe) — instalador
 
-Também há uma versão sem instalador, em [.zip](https://github.com/keepcoding-ai/shared/releases/download/tether-v0.1.0/tether-0.1.0-win-x64.zip): descompacte e abra o `tether.exe`.
+Também há uma versão sem instalador, em [.zip](https://github.com/keepcoding-ai/shared/releases/download/tether-v0.1.1/tether-0.1.1-win-x64.zip): descompacte e abra o `tether.exe`.
 
 ## Antes de instalar
 
@@ -26,4 +26,5 @@ Fechar a janela só desconecta: os agentes continuam rodando e voltam ao reabrir
 
 | Versão | Plataforma | Release |
 |---|---|---|
-| 0.1.0 | Windows 64 bits (não assinado) | `tether-v0.1.0` |
+| 0.1.1 | Windows 64 bits (não assinado) — corrige o tetherd que não subia no app instalado | `tether-v0.1.1` |
+| 0.1.0 | Windows 64 bits (não assinado) — **não use**: o tetherd não sobe | `tether-v0.1.0` |
