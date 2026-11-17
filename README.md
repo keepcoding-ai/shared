@@ -7,6 +7,7 @@ Arquivos públicos compartilhados da equipe.
 - **[soul-cli](soul-cli/)** — o terminal dos agentes do Atrium: conversar com o agente pela linha de comando.
 - **[hands](hands/)** — o terminal dos agentes do Atrium para quem usa: conversar com o agente pela linha de comando e emprestar a ele as pastas do computador.
 - **[eitri-desktop](eitri-desktop/)** — app de computador da Eitri (Mac).
+- **[tether](tether/)** — terminais que lembram a sessão do Claude Code de cada slot e a retomam depois de qualquer reinício (Windows).
 
 ## Como funciona
 
