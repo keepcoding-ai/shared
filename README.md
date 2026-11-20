@@ -8,6 +8,7 @@ Arquivos públicos compartilhados da equipe.
 - **[hands](hands/)** — o terminal dos agentes do Atrium para quem usa: conversar com o agente pela linha de comando e emprestar a ele as pastas do computador.
 - **[eitri-desktop](eitri-desktop/)** — app de computador da Eitri (Mac).
 - **[tether](tether/)** — terminais que lembram a sessão do Claude Code de cada slot e a retomam depois de qualquer reinício (Windows).
+- **[processa-desktop](processa-desktop/)** — app de computador da Processa OS (Windows).
 
 ## Como funciona
 
